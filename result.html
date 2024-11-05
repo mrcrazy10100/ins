@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSC Result Fetcher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px auto;
+            display: block;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 85%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px auto;
+            display: block;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .result h2 {
+            color: #4CAF50;
+        }
+        .grade-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .grade-list li {
+            background-color: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>HSC Result Fetcher</h1>
+    <input type="text" id="roll" placeholder="Enter Roll Number">
+    <input type="text" id="regno" placeholder="Enter Registration Number">
+    <button onclick="fetchResult()">Get Result</button>
+    <div class="result" id="result"></div>
+
+    <script>
+        async function fetchResult() {
+            const roll = document.getElementById('roll').value;
+            const regno = document.getElementById('regno').value;
+            const url = `https://hsc-results.vercel.app/result?roll=${roll}&regno=${regno}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                document.getElementById('result').innerText = 'Error: ' + error.message;
+            }
+        }
+
+        function displayResult(data) {
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = `
+                <h2>Student Info</h2>
+                <p>Name: ${data.student_info.name}</p>
+                <p>Father's Name: ${data.student_info.father_name}</p>
+                <p>Mother's Name: ${data.student_info.mother_name}</p>
+                <p>Group: ${data.student_info.group}</p>
+                <p>GPA: ${data.student_info.gpa}</p>
+                <h2>Grade Sheet</h2>
+                <ul class="grade-list">
+                    ${data.grade_sheet.map(subject => `<li>${subject.subject}: ${subject.total_marks} (${subject.grade})</li>`).join('')}
+                </ul>
+            `;
+        }
+    </script>
+</body>
+</html>
